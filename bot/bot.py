@@ -28,7 +28,7 @@ flask_thread.start()
 # ==========================================
 ADMIN_ID = 7613612803
 ADMIN_USERNAME = "@A_Vakul"
-TOKEN = "8962758198:AAEDw0dYh4zKx6BSaiv6KH4BscyaHbVA1ko"
+TOKEN = "8962758198:AAEDw0dYh4zKx6BSaiv6KH4BscyaHbVAlko"
 
 bot = telebot.TeleBot(TOKEN)
 
@@ -272,5 +272,5 @@ morning_thread = threading.Thread(target=morning_notification_scheduler, daemon=
 morning_thread.start()
 
 if __name__ == '__main__':
-    print("Супер-бот з правильним токеном та оновленим функціоналом заведено у хмару! 🚀")
+    print("Супер-бот з точним токеном заведено у хмару! 🚀")
     bot.infinity_polling(timeout=60, long_polling_timeout=60)
