@@ -22,7 +22,7 @@ flask_thread.start()
 
 ADMIN_ID = 7613612803
 ADMIN_USERNAME = "@A_Vakul"
-TOKEN = "8962758198:AAEDw0dYh4zKx6BSaiv6KH4BscyaHbVA1ko"
+TOKEN = "8962758198:AAEJrDUz7xzW3w_pkg64IGt_MISwjAdCmio"
 
 bot = telebot.TeleBot(TOKEN)
 
