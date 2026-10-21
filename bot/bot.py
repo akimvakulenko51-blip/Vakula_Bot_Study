@@ -8,23 +8,22 @@ import telebot
 from telebot import types
 
 # ==========================================
-# 1. ЗАГЛУШКА ДЛЯ RENDER (WEBSERVICE PORT BINDING)
+# 1. ВЕБСЕРВЕРНА ЗАГЛУШКА ДЛЯ RENDER (24/7)
 # ==========================================
 app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return "Vakula Bot Study Pro Ultimate is active and running 24/7! 🚀"
+    return "Vakula Bot Study Ultimate Pro is active and running 24/7! 🚀"
 
 def run_flask():
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
 
-flask_thread = threading.Thread(target=run_flask, daemon=True)
-flask_thread.start()
+threading.Thread(target=run_flask, daemon=True).start()
 
 # ==========================================
-# 2. КОНФІГУРАЦІЯ ТА ТОКЕН З BOTFATHER
+# 2. КОНФІГУРАЦІЯ ТА АДМІНІСТРУВАННЯ
 # ==========================================
 ADMIN_ID = 7613612803
 ADMIN_USERNAME = "@A_Vakul"
@@ -32,33 +31,36 @@ TOKEN = "8962758198:AAEJrDUz7xzW3w_pkg64IGt_MISwjAdCmio"
 
 bot = telebot.TeleBot(TOKEN)
 
-BUFFER_TIME = 45  # Буфер 45 секунд для голосу та фото
+BUFFER_TIME = 45  # Буфер 45 секунд для фото, документів і голосових
 user_buffers = {}
 user_languages = {} 
 user_last_tasks = {}  
 
+# ==========================================
+# 3. БАГАТОМОВНИЙ СЛОВНИК (🇺🇦, 🇷🇺, 🇬🇧, 🇵🇱)
+# ==========================================
 LANGS = {
     "uk": {
-        "welcome_admin": "Привіт-привіт, босе Акіме! 🕶️🔥\nЛаскаво просимо до твого академічного штабу. Я повністю готовий до роботи з будь-якими запитаннями, голосом та правками! 🚀",
+        "welcome_admin": "Привіт-привіт, босе Акіме! 🕶️🔥\nЛаскаво просимо до твого академічного штабу. Я повністю готовий до роботи з твоїми завданнями, голосом та правками! 🚀",
         "welcome_user": "Вітаю! 👋 Я твій академічний помічник. Оберіть мову інтерфейсу нижче:",
         "btn_subjects": "📚 Дисципліни (7 предметів)",
         "btn_files": "🗑️ Управління файлами",
         "btn_news": "📰 Новини університету",
         "btn_lang": "🇺🇦 🇷🇺 🇬🇧 🇵🇱 Змінити мову",
         "btn_about": "ℹ️ Про систему 24/7",
-        "subjects_title": "📖 **Твої поточні дисципліни (1 курс):**\n\n1. Механіка та опора матеріалів ⚙️\n2. Інженерна графіка та геометрія 📐\n3. Вища математика 📊\n4. Фізика ⚛️\n5. Програмування та ІТ 💻\n6. Матеріалознавство 🔬\n7. Польська мова (B2) 🇵🇱\n\n💡 *Кидай фото, документи чи голосові у будь-якому порядку — я чекаю 45 секунд і все опрацюю!*",
+        "subjects_title": "📖 **Твої поточні дисципліни (1 курс — Механіка і будова машин):**\n\n1. Механіка та опора матеріалів ⚙️\n2. Інженерна графіка та геометрія 📐\n3. Вища математика 📊\n4. Фізика ⚛️\n5. Програмування та ІТ 💻\n6. Матеріалознавство 🔬\n7. Польська мова (B2) 🇵🇱\n\n💡 *Кидай фото, документи чи голосові у будь-якому порядку — я чекаю 45 секунд і все опрацюю!*",
         "files_title": "🗑️ **Панель управління файлами:**",
         "btn_del_last": "❌ Видалити останній файл",
         "btn_del_all": "🧹 Очистити все сховище",
         "btn_back": "🔙 Головне меню",
         "del_last_done": "✅ Останній завантажений файл успішно видалено!",
         "del_all_done": "🧹 Усі зайві файли повністю очищено з системи!",
-        "news_title": "📰 **Останні новини Люблінської політехніки:**\n\n• Розклад сесії та консультацій оновлено на платформі університету.\n• Студентський кампус нагортає нові заходи на тижні.\n• Бібліотека працює у звичному режимі 24/7.",
-        "about_text": "🤖 **Інформація:**\n• Хмарний сервер Render 24/7\n• Гнучкий буфер (45 сек) для голосу та фото\n• Підтримка правок і заміна старих рішень на нові!",
-        "processed": "📥 **Отримано матеріали та запит!** 🚀\nЯ проаналізував задачу, розпізнав суть та підготував рішення. Якщо щось не так — просто напиши свої правки!"
+        "news_title": "📰 **Останні новини Люблінської політехніки:**\n\n• Розклад сесії та консультацій оновлено на платформі університету.\n• Студентський кампус готує нові заходи.\n• Бібліотека працює у звичному режимі.",
+        "about_text": "🤖 **Інформація про систему:**\n• Хмарний сервер Render 24/7\n• Гнучкий буфер (45 сек) для голосу та фото\n• Інтелектуальна підтримка правок і заміна старих рішень на нові!",
+        "processed": "📥 **Отримано матеріали та запит!** 🚀\nЯ проаналізував задачу, розпізнав суть та підготував детальне рішення. Якщо щось потрібно змінити — просто напиши свої правки у вільній формі!"
     },
     "ru": {
-        "welcome_admin": "Привет-привет, босс Аким! 🕶️🔥\nДобро пожаловать в твой академический штаб. Я готов работать с любыми твоими вопросами, голосовыми и правками! 🚀",
+        "welcome_admin": "Привет-привет, босс Аким! 🕶️🔥\nДобро пожаловать в твой академический штаб. Я готов работать с твоими задачами, голосовыми и правками! 🚀",
         "welcome_user": "Приветствую! 👋 Я твой академический помощник. Выберите язык интерфейса ниже:",
         "btn_subjects": "📚 Дисциплины (7 предметов)",
         "btn_files": "🗑️ Управление файлами",
@@ -72,12 +74,12 @@ LANGS = {
         "btn_back": "🔙 Главное меню",
         "del_last_done": "✅ Последний загруженный файл успешно удален!",
         "del_all_done": "🧹 Все лишние файлы полностью очищены из системы!",
-        "news_title": "📰 **Новости Люблинской политехники:**\n• Расписание сессии обновлено.",
+        "news_title": "📰 **Новости Люблинской политехники:**\n• Расписание занятий обновлено.",
         "about_text": "🤖 **Информация:** Облачный сервер Render 24/7.",
-        "processed": "📥 **Получены материалы и запрос!** 🚀"
+        "processed": "📥 **Получены материалы и запрос!** 🚀\nЯ проанализировал задачу. Если нужно что-то исправить — пиши правки!"
     },
     "en": {
-        "welcome_admin": "Hello, Boss Akim! 🕶️🔥\nWelcome to your academic headquarters. Ready for questions, voice notes, and edits! 🚀",
+        "welcome_admin": "Hello, Boss Akim! 🕶️🔥\nWelcome to your academic headquarters. Ready for your tasks, voice notes, and edits! 🚀",
         "welcome_user": "Welcome! 👋 Choose your language below:",
         "btn_subjects": "📚 Subjects (7 courses)",
         "btn_files": "🗑️ File Management",
@@ -89,18 +91,18 @@ LANGS = {
         "btn_del_last": "❌ Delete last file",
         "btn_del_all": "🧹 Clear all storage",
         "btn_back": "🔙 Main Menu",
-        "del_last_done": "✅ Deleted!",
-        "del_all_done": "🧹 Cleared!",
+        "del_last_done": "✅ Deleted successfully!",
+        "del_all_done": "🧹 Cleared successfully!",
         "news_title": "📰 **University News:**",
         "about_text": "🤖 **Information:** Cloud server Render 24/7.",
-        "processed": "📥 **Materials received!** 🚀"
+        "processed": "📥 **Materials received!** 🚀\nI analyzed the task. If you want changes, write your edits!"
     },
     "pl": {
-        "welcome_admin": "Cześć, szefie Akim! 🕶️🔥\nWitamy w centrum akademickim. Gotowy na pytania i poprawki! 🚀",
+        "welcome_admin": "Cześć, szefie Akim! 🕶️🔥\nWitamy w centrum akademickim. Gotowy na Twoje zadania, głosówki i poprawki! 🚀",
         "welcome_user": "Witaj! 👋 Wybierz język poniżej:",
         "btn_subjects": "📚 Przedmioty (7 kursów)",
         "btn_files": "🗑️ Zarządzanie plikami",
-        "btn_news": "📰 Wiadomości uniwersyteckie",
+        "btn_news": "📰 Wiadomości uczelni",
         "btn_lang": "🇺🇦 🇷🇺 🇬🇧 🇵🇱 Zmień język",
         "btn_about": "ℹ️ O systemie 24/7",
         "subjects_title": "📖 **Twoje przedmioty (1 rok):**",
@@ -108,11 +110,11 @@ LANGS = {
         "btn_del_last": "❌ Usuń ostatni plik",
         "btn_del_all": "🧹 Wyczyść magazyn",
         "btn_back": "🔙 Menu główne",
-        "del_last_done": "✅ Usunięto!",
-        "del_all_done": "🧹 Wyczyszczono!",
+        "del_last_done": "✅ Usunięto pomyślnie!",
+        "del_all_done": "🧹 Wyczyszczono pomyślnie!",
         "news_title": "📰 **Wiadomości uczelni:**",
         "about_text": "🤖 **Informacje:** Serwer w chmurze Render 24/7.",
-        "processed": "📥 **Otrzymano materiały!** 🚀"
+        "processed": "📥 **Otrzymano materiały!** 🚀\nPrzeanalizowałem zadanie. Jeśli chcesz coś zmienić, napisz poprawki!"
     }
 }
 
@@ -132,6 +134,9 @@ def get_lublin_weather():
         pass
     return "близько +15°C, хмарно з проясненнями ⛅"
 
+# ==========================================
+# 4. ГОЛОВНЕ МЕНЮ ТА ІНТЕРФЕЙС
+# ==========================================
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
     user_id = message.from_user.id
@@ -141,7 +146,11 @@ def send_welcome(message):
 
 def show_main_menu(chat_id, user_id, is_start=False):
     lang = user_languages.get(user_id, "uk")
-    greeting = LANGS[lang]["welcome_admin"] if user_id == ADMIN_ID else LANGS[lang]["welcome_user"]
+    # Перевірка на адміністратора (боса Акіма)
+    if user_id == ADMIN_ID:
+        greeting = LANGS[lang]["welcome_admin"]
+    else:
+        greeting = LANGS[lang]["welcome_user"]
 
     markup = types.InlineKeyboardMarkup(row_width=1)
     markup.add(
@@ -153,13 +162,16 @@ def show_main_menu(chat_id, user_id, is_start=False):
     )
     
     if is_start:
-        bot.send_message(chat_id, greeting, reply_markup=markup)
+        bot.send_message(chat_id, greeting, reply_markup=markup, parse_mode="Markdown")
     else:
         try:
-            bot.edit_message_text(greeting, chat_id, chat_id, reply_markup=markup)
+            bot.edit_message_text(greeting, chat_id, chat_id, reply_markup=markup, parse_mode="Markdown")
         except Exception:
-            bot.send_message(chat_id, greeting, reply_markup=markup)
+            bot.send_message(chat_id, greeting, reply_markup=markup, parse_mode="Markdown")
 
+# ==========================================
+# 5. ОБРОБКА КНОПОК ТА ЗМІНИ МОВИ
+# ==========================================
 @bot.callback_query_handler(func=lambda call: call.data.startswith("lang_") or call.data == "menu_language")
 def language_handler(call):
     chat_id = call.message.chat.id
@@ -215,6 +227,9 @@ def callback_handler(call):
         bot.answer_callback_query(call.id)
         show_main_menu(chat_id, user_id)
 
+# ==========================================
+# 6. БУФЕР (45 СЕК) ТА СИСТЕМА ПРАВОК
+# ==========================================
 @bot.message_handler(content_types=['text', 'voice', 'document', 'photo'])
 def handle_incoming_content(message):
     chat_id = message.chat.id
@@ -225,7 +240,7 @@ def handle_incoming_content(message):
         if user_id in user_last_tasks:
             bot.send_message(
                 chat_id, 
-                f"👍 Будь ласка! Радий допомогти! ✨\n📁 Старий варіант задачі успішно видалено, а фінальний поправлений конспект надійно збережено у папку.",
+                f"👍 Будь ласка, босе Акіме! Радий допомогти! ✨\n📁 Старий варіант задачі успішно видалено, а фінальний поправлений конспект надійно збережено у сховище.",
                 parse_mode="Markdown"
             )
             del user_last_tasks[user_id]
@@ -256,6 +271,9 @@ def process_user_buffer(chat_id, user_id):
     user_last_tasks[user_id] = {"status": "active"}
     bot.send_message(chat_id, get_text(user_id, "processed"), parse_mode="Markdown")
 
+# ==========================================
+# 7. РАНКОВИЙ ШЕДУЛЕР ПОГОДИ О 9:00
+# ==========================================
 def morning_notification_scheduler():
     while True:
         now = datetime.now()
@@ -264,7 +282,7 @@ def morning_notification_scheduler():
             morning_msg = (
                 f"☀️ **Добрий ранок, босе Акіме!**\n\n"
                 f"🌡️ Погода в Любліні на зараз: **{weather}**.\n"
-                f"🏛️ Нових офіційних оголошень від університету немає.\n\n"
+                f"🏛️ Нових офіційних оголошень від Люблінської політехніки немає.\n\n"
                 f"☕ Сервер працює 24/7. Чекаю на твої задачі чи запитання! 💪🎓"
             )
             try:
@@ -277,11 +295,16 @@ def morning_notification_scheduler():
 
 threading.Thread(target=morning_notification_scheduler, daemon=True).start()
 
+# ==========================================
+# 8. ЗАПУСК БЕЗ КОНФЛІКТІВ (ПОПЕРЕДЖЕННЯ 409)
+# ==========================================
 if __name__ == '__main__':
-    print("Повний бот із новинами заведено! 🚀")
+    print("Максимальний ультимативний академічний бот заведено у хмару! 🚀")
     while True:
         try:
-            bot.polling(none_stop=True, interval=2, timeout=30)
+            bot.remove_webhook()
+            time.sleep(1)
+            bot.polling(none_stop=True, interval=1, timeout=30)
         except Exception as e:
-            print(f"Помилка підключення: {e}")
-            time.sleep(5)
+            print(f"Помилка polling: {e}")
+            time.sleep(3)
