@@ -24,15 +24,15 @@ flask_thread = threading.Thread(target=run_flask, daemon=True)
 flask_thread.start()
 
 # ==========================================
-# 2. КОНФІГУРАЦІЯ ТА СЛОВНИКИ ПЕРЕКЛАДІВ (4 МОВИ З ПРАПОРЦЯМИ)
+# 2. КОНФІГУРАЦІЯ ТА ТОКЕН З BOTFATHER
 # ==========================================
 ADMIN_ID = 7613612803
 ADMIN_USERNAME = "@A_Vakul"
-TOKEN = "7953255140:AAHqT2rN1k5Bf2Q9Wq8xY5z6s3v1u0p4K7l"
+TOKEN = "8962758198:AAEDw0dYh4zKx6BSaiv6KH4BscyaHbVA1ko"
 
 bot = telebot.TeleBot(TOKEN)
 
-BUFFER_TIME = 45  # Збільшений буфер 45 секунд
+BUFFER_TIME = 45  # Буфер 45 секунд для голосу та фото
 user_buffers = {}
 user_languages = {} 
 user_last_tasks = {}  
@@ -252,7 +252,6 @@ def process_user_buffer(chat_id, user_id):
 def morning_notification_scheduler():
     while True:
         now = datetime.now()
-        # О 9:00 ранку бот самостійно надішле погоду
         if now.hour == 9 and now.minute == 0:
             weather = get_lublin_weather()
             morning_msg = (
@@ -273,5 +272,5 @@ morning_thread = threading.Thread(target=morning_notification_scheduler, daemon=
 morning_thread.start()
 
 if __name__ == '__main__':
-    print("Супер-бот з погодою, правками та мовами запущено у хмарі! 🚀")
+    print("Супер-бот з правильним токеном та оновленим функціоналом заведено у хмару! 🚀")
     bot.infinity_polling(timeout=60, long_polling_timeout=60)
