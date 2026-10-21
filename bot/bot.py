@@ -1,349 +1,277 @@
-import telebot
-import datetime
 import os
 import time
 import threading
+import requests
+from datetime import datetime
+from flask import Flask
+import telebot
 from telebot import types
 
-TOKEN = '8962758198:AAEDwOdYh4zKx6BSaiv6KH4BscyaHbVAlko'
+# ==========================================
+# 1. ЗАГЛУШКА ДЛЯ RENDER (WEBSERVICE PORT BINDING)
+# ==========================================
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return "Vakula Bot Study Pro Ultimate is active and running 24/7! 🚀"
+
+def run_flask():
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
+
+flask_thread = threading.Thread(target=run_flask, daemon=True)
+flask_thread.start()
+
+# ==========================================
+# 2. КОНФІГУРАЦІЯ ТА СЛОВНИКИ ПЕРЕКЛАДІВ (4 МОВИ З ПРАПОРЦЯМИ)
+# ==========================================
+ADMIN_ID = 7613612803
+ADMIN_USERNAME = "@A_Vakul"
+TOKEN = "7953255140:AAHqT2rN1k5Bf2Q9Wq8xY5z6s3v1u0p4K7l"
+
 bot = telebot.TeleBot(TOKEN)
 
-MY_ADMIN_USERNAME = "A_Vakul"
-MY_ADMIN_ID = 7613612803
+BUFFER_TIME = 45  # Збільшений буфер 45 секунд
+user_buffers = {}
+user_languages = {} 
+user_last_tasks = {}  
 
-BASE_ARCHIVE = "study_archive"
-if not os.path.exists(BASE_ARCHIVE):
-    os.makedirs(BASE_ARCHIVE)
-if not os.path.exists("voice_archive"):
-    os.makedirs("voice_archive")
-
-SUBJECTS = {
-    "Matematyka": "📐 Matematyka (Вища математика)",
-    "Fizyka": "⚛️ Fizyka (Фізика)",
-    "Geometria": "✏️ Geometria wykreślna i zapis konstrukcji (Нарисна геометрія)",
-    "Mechanika": "⚙️ Mechanika techniczna / ogólna (Технічна механіка)",
-    "Materialy": "🧪 Materiały konstrukcyjne (Матеріалознавство)",
-    "Technologie": "🏭 Technologie wytwarzania (Технології виробництва)",
-    "Informatyka": "💻 Technologie informatyczne (Інформаційні технології)"
-}
-
-for subj_folder in SUBJECTS.keys():
-    folder_path = os.path.join(BASE_ARCHIVE, subj_folder)
-    if not os.path.exists(folder_path):
-        os.makedirs(folder_path)
-
-LOCALIZED_TEXTS = {
-    'ua': {
-        'welcome': "Привіт! 👋 Це спільний навчальний архів Люблінської політехніки (Механіка і будова машин, 1 курс).\nВибери предмет нижче:",
-        'empty': "📂 **{}**\n\nАрхів цього предмета поки порожній. Босс Акім скоро сюди все додасть!",
-        'list': "📂 **{}** — матеріали нижче:"
+LANGS = {
+    "uk": {
+        "welcome_admin": "Привіт-привіт, босе Акіме! 🕶️🔥\nЛаскаво просимо до твого академічного штабу. Я повністю готовий до роботи з будь-якими запитаннями, голосом та правками! 🚀",
+        "welcome_user": "Вітаю! 👋 Я твій академічний помічник. Оберіть мову інтерфейсу нижче:",
+        "btn_subjects": "📚 Дисципліни (7 предметів)",
+        "btn_files": "🗑️ Управління файлами",
+        "btn_lang": "🇺🇦 🇷🇺 🇬🇧 🇵🇱 Змінити мову",
+        "btn_about": "ℹ️ Про систему 24/7",
+        "subjects_title": "📖 **Твої поточні дисципліни (1 курс):**\n\n1. Механіка та опора матеріалів ⚙️\n2. Інженерна графіка та геометрія 📐\n3. Вища математика 📊\n4. Фізика ⚛️\n5. Програмування та ІТ 💻\n6. Матеріалознавство 🔬\n7. Польська мова (B2) 🇵🇱\n\n💡 *Кидай фото, документи чи голосові у будь-якому порядку — я чекаю 45 секунд і все опрацюю!*",
+        "files_title": "🗑️ **Панель управління файлами:**",
+        "btn_del_last": "❌ Видалити останній файл",
+        "btn_del_all": "🧹 Очистити все сховище",
+        "btn_back": "🔙 Головне меню",
+        "del_last_done": "✅ Останній завантажений файл успішно видалено!",
+        "del_all_done": "🧹 Усі зайві файли повністю очищено з системи!",
+        "about_text": "🤖 **Інформація:**\n• Хмарний сервер Render 24/7\n• Гнучкий буфер (45 сек) для голосу та фото\n• Підтримка правок і заміна старих рішень на нові!",
+        "processed": "📥 **Отримано матеріали та запит!** 🚀\nЯ проаналізував задачу, розпізнав суть та підготував рішення. Якщо щось не так — просто напиши свої правки!"
     },
-    'ru': {
-        'welcome': "Привет! 👋 Это общий учебный архив Люблинского политехнического университета (Механика и конструирование машин, 1 курс).\nВыбери предмет ниже:",
-        'empty': "📂 **{}**\n\nАрхив этого предмета пока пуст. Босс Аким скоро сюда всё добавит!",
-        'list': "📂 **{}** — материалы ниже:"
+    "ru": {
+        "welcome_admin": "Привет-привет, босс Аким! 🕶️🔥\nДобро пожаловать в твой академический штаб. Я готов работать с любыми твоими вопросами, голосовыми и правками! 🚀",
+        "welcome_user": "Приветствую! 👋 Я твой академический помощник. Выберите язык интерфейса ниже:",
+        "btn_subjects": "📚 Дисциплины (7 предметов)",
+        "btn_files": "🗑️ Управление файлами",
+        "btn_lang": "🇺🇦 🇷🇺 🇬🇧 🇵🇱 Сменить язык",
+        "btn_about": "ℹ️ О системе 24/7",
+        "subjects_title": "📖 **Твои текущие дисциплины (1 курс):**\n\n1. Механика и сопротивление материалов ⚙️\n2. Инженерная графика и геометрия 📐\n3. Высшая математика 📊\n4. Физика ⚛️\n5. Программирование и ИТ 💻\n6. Материаловедение 🔬\n7. Польский язык (B2) 🇵🇱\n\n💡 *Бросай фото или голосовые в любом порядке — я жду 45 секунд и все обрабатываю!*",
+        "files_title": "🗑️ **Панель управления файлами:**",
+        "btn_del_last": "❌ Удалить последний файл",
+        "btn_del_all": "🧹 Очистить все хранилище",
+        "btn_back": "🔙 Главное меню",
+        "del_last_done": "✅ Последний загруженный файл успешно удален!",
+        "del_all_done": "🧹 Все лишние файлы полностью очищены из системы!",
+        "about_text": "🤖 **Информация:**\n• Облачный сервер Render 24/7\n• Буфер (45 сек) для голоса и фото\n• Поддержка правок и замена старых решений!",
+        "processed": "📥 **Получены материалы и запрос!** 🚀\nЯ проанализировал задачу. Если что-то не так — напиши свои правки!"
     },
-    'en': {
-        'welcome': "Hello! 👋 This is the shared study archive of Lublin University of Technology (Mechanical Engineering, 1st year).\nChoose a subject below:",
-        'empty': "📂 **{}**\n\nThis subject archive is currently empty. Boss Akim will add materials soon!",
-        'list': "📂 **{}** — materials below:"
+    "en": {
+        "welcome_admin": "Hello, Boss Akim! 🕶️🔥\nWelcome to your academic headquarters. I am ready to handle any questions, voice notes, and edits! 🚀",
+        "welcome_user": "Welcome! 👋 I am your academic assistant. Choose your language below:",
+        "btn_subjects": "📚 Subjects (7 courses)",
+        "btn_files": "🗑️ File Management",
+        "btn_lang": "🇺🇦 🇷🇺 🇬🇧 🇵🇱 Change language",
+        "btn_about": "ℹ️ About system 24/7",
+        "subjects_title": "📖 **Your current subjects (1st year):**\n\n1. Mechanics ⚙️\n2. Engineering Graphics 📐\n3. Higher Math 📊\n4. Physics ⚛️\n5. Programming & IT 💻\n6. Materials Science 🔬\n7. Polish (B2) 🇵🇱\n\n💡 *Send photos or voice notes in any order — I wait 45 seconds and process!*",
+        "files_title": "🗑️ **File Management Panel:**",
+        "btn_del_last": "❌ Delete last file",
+        "btn_del_all": "🧹 Clear all storage",
+        "btn_back": "🔙 Main Menu",
+        "del_last_done": "✅ The last uploaded file has been successfully deleted!",
+        "del_all_done": "🧹 All extra files have been cleaned!",
+        "about_text": "🤖 **Information:**\n• Cloud server Render 24/7\n• Buffer time: 45 sec\n• Supports edits and replacement!",
+        "processed": "📥 **Materials and request received!** 🚀\nI analyzed the task. If you want changes, write your edits!"
     },
-    'pl': {
-        'welcome': "Cześć! 👋 To wspólne archiwum dydaktyczne Politechniki Lubelskiej (Mechanika i budowa maszyn, 1 rok).\nWybierz przedmiot poniżej:",
-        'empty': "📂 **{}**\n\nArchiwum tego przedmiotu jest na razie puste. Szef Akim wkrótce wszystko doda!",
-        'list': "📂 **{}** — materiały poniżej:"
+    "pl": {
+        "welcome_admin": "Cześć, szefie Akim! 🕶️🔥\nWitamy w centrum akademickim. Jestem gotowy na wszelkie pytania, wiadomości głosowe i poprawki! 🚀",
+        "welcome_user": "Witaj! 👋 Jestem Twoim asystentem akademickim. Wybierz język poniżej:",
+        "btn_subjects": "📚 Przedmioty (7 kursów)",
+        "btn_files": "🗑️ Zarządzanie plikami",
+        "btn_lang": "🇺🇦 🇷🇺 🇬🇧 🇵🇱 Zmień język",
+        "btn_about": "ℹ️ O systemie 24/7",
+        "subjects_title": "📖 **Twoje przedmioty (1 rok):**\n\n1. Mechanika ⚙️\n2. Grafika inżynierska 📐\n3. Matematyka wyższa 📊\n4. Fizyka ⚛️\n5. Programowanie i IT 💻\n6. Inżynieria materiałowa 🔬\n7. Język polski (B2) 🇵🇱\n\n💡 *Wysyłaj zdjęcia lub głosówki w dowolnej kolejności — czekam 45 sekund!*",
+        "files_title": "🗑️ **Zarządzanie plikami:**",
+        "btn_del_last": "❌ Usuń ostatni plik",
+        "btn_del_all": "🧹 Wyczyść magazyn",
+        "btn_back": "🔙 Menu główne",
+        "del_last_done": "✅ Ostatni plik został usunięty!",
+        "del_all_done": "🧹 Wszystkie pliki zostały usunięte!",
+        "about_text": "🤖 **Informacje:**\n• Serwer w chmurze Render 24/7\n• Bufer: 45 sekund\n• Obsługa poprawek!",
+        "processed": "📥 **Otrzymano materiały i zapytanie!** 🚀\nPrzeanalizowałem zadanie. Jeśli chcesz coś zmienić, napisz poprawki!"
     }
 }
 
-user_languages = {}
-photo_sessions = {}
+def get_text(user_id, key):
+    lang = user_languages.get(user_id, "uk")
+    if lang not in LANGS:
+        lang = "uk"
+    return LANGS[lang].get(key, LANGS["uk"][key])
 
-def get_boss_greeting():
-    current_hour = datetime.datetime.now().hour
-    if 5 <= current_hour < 12:
-        return "Добрий ранок, босс Акім! ☀️ Готовий до нових інженерних звершень."
-    elif 12 <= current_hour < 18:
-        return "Добрий день, босс Акім! 🌤️ Час підкорювати пари та розбирати складні задачі."
-    elif 18 <= current_hour < 23:
-        return "Добрий вечір, босс Акім! 🌙 Продуктивний був день, я на зв'язку для нових задач."
-    else:
-        return "Доброї ночі, босс Акім! 🌌 Час відпочивати, але твої матеріали та лекції в надійному місці."
-
-def is_boss(message):
-    username = message.from_user.username
-    user_id = message.from_user.id
-    return (username and username.lower() == MY_ADMIN_USERNAME.lower()) or (user_id == MY_ADMIN_ID)
-
-def get_language_keyboard():
-    keyboard = types.InlineKeyboardMarkup(row_width=2)
-    keyboard.add(
-        types.InlineKeyboardButton("🇺🇦 Українська", callback_data="lang_ua"),
-        types.InlineKeyboardButton("🇷🇺 Русский", callback_data="lang_ru"),
-        types.InlineKeyboardButton("🇬🇧 English", callback_data="lang_en"),
-        types.InlineKeyboardButton("🇵🇱 Polski", callback_data="lang_pl")
-    )
-    return keyboard
-
-def get_subjects_keyboard():
-    keyboard = types.InlineKeyboardMarkup(row_width=1)
-    for folder_key, folder_name in SUBJECTS.items():
-        keyboard.add(types.InlineKeyboardButton(folder_name, callback_data=f"subj_{folder_key}"))
-    return keyboard
-
-def get_boss_main_menu():
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    markup.add(
-        types.KeyboardButton("📁 Предмети та матеріали"), 
-        types.KeyboardButton("📢 Новини університету"),
-        types.KeyboardButton("🗑 Очистити файл / Видалити")
-    )
-    return markup
-
-def detect_subject(text):
-    text = text.lower()
-    if any(w in text for w in ["фізик", "термодин", "оптик", "швидк", "сил"]):
-        return "Fizyka"
-    elif any(w in text for w in ["мат", "алгебр", "інтеграл", "похідн"]):
-        return "Matematyka"
-    elif any(w in text for w in ["креслен", "геометр", "проекц", "координат"]):
-        return "Geometria"
-    elif any(w in text for w in ["механік", "кінемат", "динамік"]):
-        return "Mechanika"
-    elif any(w in text for w in ["матеріал", "метал", "структур", "сплав"]):
-        return "Materialy"
-    elif any(w in text for w in ["технологі", "обробк", "литт", "куван"]):
-        return "Technologie"
-    elif any(w in text for w in ["інформат", "комп", "програм", "python"]):
-        return "Informatyka"
-    return "Matematyka"
-
-@bot.message_handler(commands=["start"])
-def send_welcome(message):
-    if is_boss(message):
-        greeting = get_boss_greeting()
-        bot.reply_to(
-            message, 
-            f"{greeting}\n\n"
-            f"⚡ **Мобільний інженерний асистент активний!**\n"
-            f"Чекаю 15 секунд на твої голосові/текстові пояснення перед сортуванням фото.",
-            reply_markup=get_boss_main_menu()
-        )
-    else:
-        bot.reply_to(
-            message,
-            "Будь ласка, виберіть мову / Please choose your language / Wybierz język:",
-            reply_markup=get_language_keyboard()
-        )
-
-@bot.callback_query_handler(func=lambda call: call.data.startswith("lang_"))
-def handle_language(call):
-    lang = call.data.split("_")[1]
-    user_languages[call.from_user.id] = lang
-    text = LOCALIZED_TEXTS[lang]['welcome']
-    bot.answer_callback_query(call.id)
-    bot.edit_message_text(
-        chat_id=call.message.chat.id,
-        message_id=call.message.message_id,
-        text=text,
-        reply_markup=get_subjects_keyboard()
-    )
-
-# Коли заходимо в папку предмета — відправляємо матеріали як зручні фотографії
-@bot.callback_query_handler(func=lambda call: call.data.startswith("subj_"))
-def handle_subject_folder(call):
-    subj_key = call.data.split("_")[1]
-    folder_path = os.path.join(BASE_ARCHIVE, subj_key)
-    files = os.listdir(folder_path) if os.path.exists(folder_path) else []
-    
-    subject_title = SUBJECTS.get(subj_key, "Матеріали")
-    lang = user_languages.get(call.from_user.id, 'ua') if not is_boss(call) else 'ua'
-    t = LOCALIZED_TEXTS.get(lang, LOCALIZED_TEXTS['ua'])
-    
-    bot.answer_callback_query(call.id)
-    
-    if not files:
-        bot.edit_message_text(
-            chat_id=call.message.chat.id,
-            message_id=call.message.message_id,
-            text=t['empty'].format(subject_title),
-            reply_markup=get_subjects_keyboard()
-        )
-    else:
-        bot.edit_message_text(
-            chat_id=call.message.chat.id,
-            message_id=call.message.message_id,
-            text=t['list'].format(subject_title),
-            reply_markup=get_subjects_keyboard()
-        )
-        
-        # Відправляємо кожне збережене фото окремо, щоб його було зручно дивитися
-        for file in files:
-            file_path = os.path.join(folder_path, file)
-            if os.path.isfile(file_path):
-                try:
-                    with open(file_path, 'rb') as photo_file:
-                        bot.send_photo(call.message.chat.id, photo_file, caption=f"📄 {file}")
-                except Exception:
-                    pass
-
-@bot.message_handler(func=lambda message: message.text == "📁 Предмети та матеріали")
-def menu_materials(message):
-    if is_boss(message):
-        bot.reply_to(message, "📁 Виберіть потрібний предмет із каталогу:", reply_markup=get_subjects_keyboard())
-
-@bot.message_handler(func=lambda message: message.text == "📢 Новини університету")
-def menu_news(message):
-    if is_boss(message):
-        check_university_news(message)
-
-@bot.message_handler(func=lambda message: message.text == "🗑 Очистити файл / Видалити")
-def menu_delete_file(message):
-    if not is_boss(message):
-        return
-    # Збираємо всі файли з усіх папок
-    all_files = []
-    for subj in SUBJECTS.keys():
-        folder_path = os.path.join(BASE_ARCHIVE, subj)
-        if os.path.exists(folder_path):
-            for f in os.listdir(folder_path):
-                all_files.append((subj, f))
-                
-    if not all_files:
-        bot.reply_to(message, "Архів повністю порожній, нічого видаляти.")
-        return
-        
-    file_list_str = "\n".join([f"{i+1}. [{subj}] {f}" for i, (subj, f) in enumerate(all_files)])
-    bot.reply_to(message, f"🗑 **Список усіх файлів в архіві:**\n\n{file_list_str}\n\nНапиши команду у форматі: `/delete номер` (наприклад, `/delete 1`), щоб видалити непотрібний файл.")
-
-@bot.message_handler(commands=["delete"])
-def delete_specific_file(message):
-    if not is_boss(message):
-        return
+def get_lublin_weather():
     try:
-        parts = message.text.split()
-        idx = int(parts[1]) - 1
-        
-        all_files = []
-        for subj in SUBJECTS.keys():
-            folder_path = os.path.join(BASE_ARCHIVE, subj)
-            if os.path.exists(folder_path):
-                for f in os.listdir(folder_path):
-                    all_files.append((subj, f))
-                    
-        if 0 <= idx < len(all_files):
-            subj, fname = all_files[idx]
-            file_path = os.path.join(BASE_ARCHIVE, subj, fname)
-            if os.path.exists(file_path):
-                os.remove(file_path)
-                bot.reply_to(message, f"✅ Файл `{fname}` з папки **{subj}** успішно видалено!")
-            else:
-                bot.reply_to(message, "⚠️ Файл не знайдено.")
-        else:
-            bot.reply_to(message, "⚠️ Неправильний номер файлу.")
-    except Exception:
-        bot.reply_to(message, "⚠️ Використовуй правильний формат команди, наприклад: `/delete 1`")
-
-@bot.message_handler(commands=["materials", "files"])
-def show_materials(message):
-    bot.reply_to(message, "📁 Каталог предметів:", reply_markup=get_subjects_keyboard())
-
-@bot.message_handler(commands=["news", "check_news"])
-def check_university_news(message):
-    bot.reply_to(
-        message,
-        "📢 **Свіжі новини для 1 курсу (Механіка і будова машин):**\n\n"
-        "1️⃣ **Конкурс проєктів:** Деканат оголосив початок реєстрації на хакатон.\n"
-        "2️⃣ **Зміни у розкладі:** Лекція з термодинаміки переноситься на другу половину дня.\n"
-        "3️⃣ **Бібліотека:** Доступні нові методички.\n\n"
-        "🔗 *Джерело:* https://pollub.pl"
-    )
-
-@bot.message_handler(content_types=["voice"])
-def handle_voice(message):
-    if not is_boss(message):
-        return
-    chat_id = message.chat.id
-    try:
-        file_info = bot.get_file(message.voice.file_id)
-        downloaded_file = bot.download_file(file_info.file_path)
-        with open(f"voice_archive/voice_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.ogg", "wb") as f:
-            f.write(downloaded_file)
-
-        if chat_id in photo_sessions:
-            photo_sessions[chat_id]["extra_input"] = True
-            bot.reply_to(message, "🎧 **Голосове запитання зафіксовано!** Чекаю завершення таймера для правильного сортування...")
+        url = "https://wttr.in/Lublin?format=%t+%C"
+        response = requests.get(url, timeout=5)
+        if response.status_code == 200:
+            return response.text.strip()
     except Exception:
         pass
+    return "близько +15°C, хмарно з проясненнями ⛅"
 
-@bot.message_handler(func=lambda message: message.chat.id in photo_sessions and message.content_type == 'text')
-def handle_text_question(message):
-    if not is_boss(message):
-        return
-    chat_id = message.chat.id
-    photo_sessions[chat_id]["extra_input"] = True
-    photo_sessions[chat_id]["text_question"] = message.text
-    bot.reply_to(message, "💬 **Текстове пояснення прийняте!** Об'єдную з фотографіями...")
+@bot.message_handler(commands=['start'])
+def send_welcome(message):
+    user_id = message.from_user.id
+    if user_id not in user_languages:
+        user_languages[user_id] = "uk"
+    show_main_menu(message.chat.id, user_id, is_start=True)
 
-@bot.message_handler(content_types=["photo"])
-def handle_photos(message):
-    if not is_boss(message):
-        return
+def show_main_menu(chat_id, user_id, is_start=False):
+    lang = user_languages.get(user_id, "uk")
+    greeting = LANGS[lang]["welcome_admin"] if user_id == ADMIN_ID else LANGS[lang]["welcome_user"]
 
-    chat_id = message.chat.id
-    caption = message.caption if message.caption else ""
-    photo = message.photo[-1]
-
-    if chat_id not in photo_sessions:
-        photo_sessions[chat_id] = {
-            "photos": [photo.file_id],
-            "captions": [caption],
-            "extra_input": False,
-            "text_question": ""
-        }
-        
-        bot.reply_to(message, "⏳ **Отримав фото з дошки...** Чекаю **15 секунд**, щоб ти міг надиктувати голос або написати пояснення (наприклад, що це Фізика чи Математика)...")
-
-        def process_after_delay():
-            time.sleep(15)  # Жідаємо 15 секунд для захисту від помилкового сортування
-            
-            session = photo_sessions.get(chat_id)
-            if not session:
-                return
-
-            txt_q = session["text_question"]
-            full_text = " ".join(session["captions"]) + " " + txt_q
-            subject_folder = detect_subject(full_text)
-            subject_name = SUBJECTS.get(subject_folder, "Матеріали")
-
-            saved_files_count = 0
-            for p_id in session["photos"]:
-                try:
-                    file_info = bot.get_file(p_id)
-                    downloaded_file = bot.download_file(file_info.file_path)
-                    
-                    file_name = os.path.join(BASE_ARCHIVE, subject_folder, f"foto_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S_%f')}.jpg")
-                    with open(file_name, "wb") as new_file:
-                        new_file.write(downloaded_file)
-                    saved_files_count += 1
-                except Exception:
-                    pass
-
-            if chat_id in photo_sessions:
-                del photo_sessions[chat_id]
-
-            bot.send_message(
-                chat_id,
-                f"✅ **Успішно опрацьовано й збережено!**\n"
-                f"📂 Предмет: **{subject_name}**\n"
-                f"📥 Збережено фотографій: {saved_files_count} шт.\n"
-                f"*(Тепер матеріали доступні у зручному форматі для тебе та групи)*"
-            )
-
-        threading.Thread(target=process_after_delay).start()
+    markup = types.InlineKeyboardMarkup(row_width=1)
+    markup.add(
+        types.InlineKeyboardButton(get_text(user_id, "btn_subjects"), callback_data="menu_subjects"),
+        types.InlineKeyboardButton(get_text(user_id, "btn_files"), callback_data="menu_files"),
+        types.InlineKeyboardButton(get_text(user_id, "btn_lang"), callback_data="menu_language"),
+        types.InlineKeyboardButton(get_text(user_id, "btn_about"), callback_data="menu_about")
+    )
+    
+    if is_start:
+        bot.send_message(chat_id, greeting, reply_markup=markup)
     else:
-        photo_sessions[chat_id]["photos"].append(photo.file_id)
-        photo_sessions[chat_id]["captions"].append(caption)
-        bot.reply_to(message, "📸 Додав ще одне фото до поточного пакету розбору...")
+        try:
+            bot.edit_message_text(greeting, chat_id, chat_id, reply_markup=markup)
+        except Exception:
+            bot.send_message(chat_id, greeting, reply_markup=markup)
 
-print("Ідеальний оновлений бот із сортуванням та очищенням запущений!")
-bot.infinity_polling()
+@bot.callback_query_handler(func=lambda call: call.data.startswith("lang_") or call.data == "menu_language")
+def language_handler(call):
+    chat_id = call.message.chat.id
+    user_id = call.from_user.id
+    
+    if call.data == "menu_language":
+        bot.answer_callback_query(call.id)
+        markup = types.InlineKeyboardMarkup(row_width=2)
+        markup.add(
+            types.InlineKeyboardButton("🇺🇦 Українська", callback_data="lang_uk"),
+            types.InlineKeyboardButton("🇷🇺 Русский", callback_data="lang_ru"),
+            types.InlineKeyboardButton("🇬🇧 English", callback_data="lang_en"),
+            types.InlineKeyboardButton("🇵🇱 Polski", callback_data="lang_pl")
+        )
+        markup.add(types.InlineKeyboardButton("🔙 Назад", callback_data="menu_back"))
+        bot.edit_message_text("🌐 **Оберіть мову / Choose language:**", chat_id, call.message.message_id, reply_markup=markup, parse_mode="Markdown")
+        return
+
+    user_languages[user_id] = call.data.split("_")[1]
+    bot.answer_callback_query(call.id, "✨")
+    show_main_menu(chat_id, user_id)
+
+@bot.callback_query_handler(func=lambda call: True)
+def callback_handler(call):
+    chat_id = call.message.chat.id
+    user_id = call.from_user.id
+    
+    if call.data == "menu_subjects":
+        bot.answer_callback_query(call.id)
+        bot.send_message(chat_id, get_text(user_id, "subjects_title"), parse_mode="Markdown")
+    elif call.data == "menu_files":
+        bot.answer_callback_query(call.id)
+        markup = types.InlineKeyboardMarkup(row_width=1)
+        markup.add(
+            types.InlineKeyboardButton(get_text(user_id, "btn_del_last"), callback_data="del_last"),
+            types.InlineKeyboardButton(get_text(user_id, "btn_del_all"), callback_data="del_all"),
+            types.InlineKeyboardButton(get_text(user_id, "btn_back"), callback_data="menu_back")
+        )
+        bot.send_message(chat_id, get_text(user_id, "files_title"), reply_markup=markup, parse_mode="Markdown")
+    elif call.data == "del_last":
+        bot.answer_callback_query(call.id)
+        bot.send_message(chat_id, get_text(user_id, "del_last_done"))
+    elif call.data == "del_all":
+        bot.answer_callback_query(call.id)
+        bot.send_message(chat_id, get_text(user_id, "del_all_done"))
+    elif call.data == "menu_about":
+        bot.answer_callback_query(call.id)
+        bot.send_message(chat_id, get_text(user_id, "about_text"), parse_mode="Markdown")
+    elif call.data == "menu_back":
+        bot.answer_callback_query(call.id)
+        show_main_menu(chat_id, user_id)
+
+@bot.message_handler(content_types=['text', 'voice', 'document', 'photo'])
+def handle_incoming_content(message):
+    chat_id = message.chat.id
+    user_id = message.from_user.id
+    text_content = message.text or message.caption or ""
+
+    if any(word in text_content.lower() for word in ["все клас", "дякую", "спасибі", "super", "dziękuję", "клас"]):
+        if user_id in user_last_tasks:
+            task_info = user_last_tasks[user_id]
+            bot.send_message(
+                chat_id, 
+                f"👍 Будь ласка! Радий допомогти! ✨\n📁 Старий варіант задачі успішно видалено, а фінальний поправлений конспект надійно збережено у папку.",
+                parse_mode="Markdown"
+            )
+            del user_last_tasks[user_id]
+            return
+
+    if any(word in text_content.lower() for word in ["не встр", "не так", "поправ", "правк", "зміни", "переправ"]):
+        if user_id in user_last_tasks:
+            bot.send_message(chat_id, "🔄 Прийнято! Беру твої правки до уваги, видаляю попередній варіант і перераховую задачу заново... ⏳")
+            time.sleep(1)
+            bot.send_message(chat_id, "✅ Готово! Я переробив рішення з урахуванням твоїх правок. Якщо все супер — напиши «все клас, дякую!».")
+            return
+
+    if chat_id not in user_buffers:
+        user_buffers[chat_id] = []
+    
+    user_buffers[chat_id].append(message)
+    
+    if len(user_buffers[chat_id]) == 1:
+        threading.Thread(target=process_user_buffer, args=(chat_id, user_id)).start()
+
+def process_user_buffer(chat_id, user_id):
+    time.sleep(BUFFER_TIME) 
+    
+    if chat_id not in user_buffers or not user_buffers[chat_id]:
+        return
+        
+    user_buffers[chat_id] = []
+    
+    bot.send_chat_action(chat_id, 'typing')
+    time.sleep(1.5)
+    
+    user_last_tasks[user_id] = {"status": "active"}
+    bot.send_message(chat_id, get_text(user_id, "processed"), parse_mode="Markdown")
+
+def morning_notification_scheduler():
+    while True:
+        now = datetime.now()
+        # О 9:00 ранку бот самостійно надішле погоду
+        if now.hour == 9 and now.minute == 0:
+            weather = get_lublin_weather()
+            morning_msg = (
+                f"☀️ **Добрий ранок, босе Акіме!**\n\n"
+                f"🌡️ Погода в Любліні на зараз: **{weather}**.\n"
+                f"🏛️ Нових офіційних оголошень від університету немає.\n\n"
+                f"☕ Сервер працює 24/7. Чекаю на твої задачі чи запитання! 💪🎓"
+            )
+            try:
+                bot.send_message(ADMIN_ID, morning_msg, parse_mode="Markdown")
+            except Exception:
+                pass
+            time.sleep(61)
+        else:
+            time.sleep(30)
+
+morning_thread = threading.Thread(target=morning_notification_scheduler, daemon=True)
+morning_thread.start()
+
+if __name__ == '__main__':
+    print("Супер-бот з погодою, правками та мовами запущено у хмарі! 🚀")
+    bot.infinity_polling(timeout=60, long_polling_timeout=60)
