@@ -278,5 +278,10 @@ def morning_notification_scheduler():
 threading.Thread(target=morning_notification_scheduler, daemon=True).start()
 
 if __name__ == '__main__':
-    print("Повний бот із новинами, мовами та правками заведено! 🚀")
-    bot.infinity_polling(timeout=60, long_polling_timeout=60)
+    print("Повний бот із новинами заведено! 🚀")
+    while True:
+        try:
+            bot.polling(none_stop=True, interval=2, timeout=30)
+        except Exception as e:
+            print(f"Помилка підключення: {e}")
+            time.sleep(5)
