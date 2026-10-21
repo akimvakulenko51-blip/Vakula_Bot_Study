@@ -43,6 +43,7 @@ LANGS = {
         "welcome_user": "Вітаю! 👋 Я твій академічний помічник. Оберіть мову інтерфейсу нижче:",
         "btn_subjects": "📚 Дисципліни (7 предметів)",
         "btn_files": "🗑️ Управління файлами",
+        "btn_news": "📰 Новини університету",
         "btn_lang": "🇺🇦 🇷🇺 🇬🇧 🇵🇱 Змінити мову",
         "btn_about": "ℹ️ Про систему 24/7",
         "subjects_title": "📖 **Твої поточні дисципліни (1 курс):**\n\n1. Механіка та опора матеріалів ⚙️\n2. Інженерна графіка та геометрія 📐\n3. Вища математика 📊\n4. Фізика ⚛️\n5. Програмування та ІТ 💻\n6. Матеріалознавство 🔬\n7. Польська мова (B2) 🇵🇱\n\n💡 *Кидай фото, документи чи голосові у будь-якому порядку — я чекаю 45 секунд і все опрацюю!*",
@@ -52,6 +53,7 @@ LANGS = {
         "btn_back": "🔙 Головне меню",
         "del_last_done": "✅ Останній завантажений файл успішно видалено!",
         "del_all_done": "🧹 Усі зайві файли повністю очищено з системи!",
+        "news_title": "📰 **Останні новини Люблінської політехніки:**\n\n• Розклад сесії та консультацій оновлено на платформі університету.\n• Студентський кампус нагортає нові заходи на тижні.\n• Бібліотека працює у звичному режимі 24/7.",
         "about_text": "🤖 **Інформація:**\n• Хмарний сервер Render 24/7\n• Гнучкий буфер (45 сек) для голосу та фото\n• Підтримка правок і заміна старих рішень на нові!",
         "processed": "📥 **Отримано матеріали та запит!** 🚀\nЯ проаналізував задачу, розпізнав суть та підготував рішення. Якщо щось не так — просто напиши свої правки!"
     },
@@ -60,51 +62,57 @@ LANGS = {
         "welcome_user": "Приветствую! 👋 Я твой академический помощник. Выберите язык интерфейса ниже:",
         "btn_subjects": "📚 Дисциплины (7 предметов)",
         "btn_files": "🗑️ Управление файлами",
+        "btn_news": "📰 Новости университета",
         "btn_lang": "🇺🇦 🇷🇺 🇬🇧 🇵🇱 Сменить язык",
         "btn_about": "ℹ️ О системе 24/7",
-        "subjects_title": "📖 **Твои текущие дисциплины (1 курс):**\n\n1. Механика и сопротивление материалов ⚙️\n2. Инженерная графика и геометрия 📐\n3. Высшая математика 📊\n4. Физика ⚛️\n5. Программирование и ИТ 💻\n6. Материаловедение 🔬\n7. Польский язык (B2) 🇵🇱\n\n💡 *Бросай фото или голосовые в любом порядке — я жду 45 секунд и все обрабатываю!*",
+        "subjects_title": "📖 **Твои текущие дисциплины (1 курс):**\n\n1. Механика и сопротивление материалов ⚙️\n2. Инженерная графика и геометрия 📐\n3. Высшая математика 📊\n4. Физика ⚛️\n5. Программирование и ИТ 💻\n6. Материаловедение 🔬\n7. Польский язык (B2) 🇵🇱",
         "files_title": "🗑️ **Панель управления файлами:**",
         "btn_del_last": "❌ Удалить последний файл",
         "btn_del_all": "🧹 Очистить все хранилище",
         "btn_back": "🔙 Главное меню",
         "del_last_done": "✅ Последний загруженный файл успешно удален!",
         "del_all_done": "🧹 Все лишние файлы полностью очищены из системы!",
-        "about_text": "🤖 **Информация:**\n• Облачный сервер Render 24/7\n• Буфер (45 сек) для голоса и фото\n• Поддержка правок и замена старых решений!",
-        "processed": "📥 **Получены материалы и запрос!** 🚀\nЯ проанализировал задачу. Если что-то не так — напиши свои правки!"
+        "news_title": "📰 **Новости Люблинской политехники:**\n• Расписание сессии обновлено.",
+        "about_text": "🤖 **Информация:** Облачный сервер Render 24/7.",
+        "processed": "📥 **Получены материалы и запрос!** 🚀"
     },
     "en": {
-        "welcome_admin": "Hello, Boss Akim! 🕶️🔥\nWelcome to your academic headquarters. I am ready to handle any questions, voice notes, and edits! 🚀",
-        "welcome_user": "Welcome! 👋 I am your academic assistant. Choose your language below:",
+        "welcome_admin": "Hello, Boss Akim! 🕶️🔥\nWelcome to your academic headquarters. Ready for questions, voice notes, and edits! 🚀",
+        "welcome_user": "Welcome! 👋 Choose your language below:",
         "btn_subjects": "📚 Subjects (7 courses)",
         "btn_files": "🗑️ File Management",
+        "btn_news": "📰 University News",
         "btn_lang": "🇺🇦 🇷🇺 🇬🇧 🇵🇱 Change language",
         "btn_about": "ℹ️ About system 24/7",
-        "subjects_title": "📖 **Your current subjects (1st year):**\n\n1. Mechanics ⚙️\n2. Engineering Graphics 📐\n3. Higher Math 📊\n4. Physics ⚛️\n5. Programming & IT 💻\n6. Materials Science 🔬\n7. Polish (B2) 🇵🇱\n\n💡 *Send photos or voice notes in any order — I wait 45 seconds and process!*",
+        "subjects_title": "📖 **Your current subjects (1st year):**",
         "files_title": "🗑️ **File Management Panel:**",
         "btn_del_last": "❌ Delete last file",
         "btn_del_all": "🧹 Clear all storage",
         "btn_back": "🔙 Main Menu",
-        "del_last_done": "✅ The last uploaded file has been successfully deleted!",
-        "del_all_done": "🧹 All extra files have been cleaned!",
-        "about_text": "🤖 **Information:**\n• Cloud server Render 24/7\n• Buffer time: 45 sec\n• Supports edits and replacement!",
-        "processed": "📥 **Materials and request received!** 🚀\nI analyzed the task. If you want changes, write your edits!"
+        "del_last_done": "✅ Deleted!",
+        "del_all_done": "🧹 Cleared!",
+        "news_title": "📰 **University News:**",
+        "about_text": "🤖 **Information:** Cloud server Render 24/7.",
+        "processed": "📥 **Materials received!** 🚀"
     },
     "pl": {
-        "welcome_admin": "Cześć, szefie Akim! 🕶️🔥\nWitamy w centrum akademickim. Jestem gotowy na wszelkie pytania, wiadomości głosowe i poprawki! 🚀",
-        "welcome_user": "Witaj! 👋 Jestem Twoim asystentem akademickim. Wybierz język poniżej:",
+        "welcome_admin": "Cześć, szefie Akim! 🕶️🔥\nWitamy w centrum akademickim. Gotowy na pytania i poprawki! 🚀",
+        "welcome_user": "Witaj! 👋 Wybierz język poniżej:",
         "btn_subjects": "📚 Przedmioty (7 kursów)",
         "btn_files": "🗑️ Zarządzanie plikami",
+        "btn_news": "📰 Wiadomości uniwersyteckie",
         "btn_lang": "🇺🇦 🇷🇺 🇬🇧 🇵🇱 Zmień język",
         "btn_about": "ℹ️ O systemie 24/7",
-        "subjects_title": "📖 **Twoje przedmioty (1 rok):**\n\n1. Mechanika ⚙️\n2. Grafika inżynierska 📐\n3. Matematyka wyższa 📊\n4. Fizyka ⚛️\n5. Programowanie i IT 💻\n6. Inżynieria materiałowa 🔬\n7. Język polski (B2) 🇵🇱\n\n💡 *Wysyłaj zdjęcia lub głosówki w dowolnej kolejności — czekam 45 sekund!*",
+        "subjects_title": "📖 **Twoje przedmioty (1 rok):**",
         "files_title": "🗑️ **Zarządzanie plikami:**",
         "btn_del_last": "❌ Usuń ostatni plik",
         "btn_del_all": "🧹 Wyczyść magazyn",
         "btn_back": "🔙 Menu główne",
-        "del_last_done": "✅ Ostatni plik został usunięty!",
-        "del_all_done": "🧹 Wszystkie pliki zostały usunięte!",
-        "about_text": "🤖 **Informacje:**\n• Serwer w chmurze Render 24/7\n• Bufer: 45 sekund\n• Obsługa poprawek!",
-        "processed": "📥 **Otrzymano materiały i zapytanie!** 🚀\nPrzeanalizowałem zadanie. Jeśli chcesz coś zmienić, napisz poprawki!"
+        "del_last_done": "✅ Usunięto!",
+        "del_all_done": "🧹 Wyczyszczono!",
+        "news_title": "📰 **Wiadomości uczelni:**",
+        "about_text": "🤖 **Informacje:** Serwer w chmurze Render 24/7.",
+        "processed": "📥 **Otrzymano materiały!** 🚀"
     }
 }
 
@@ -139,6 +147,7 @@ def show_main_menu(chat_id, user_id, is_start=False):
     markup.add(
         types.InlineKeyboardButton(get_text(user_id, "btn_subjects"), callback_data="menu_subjects"),
         types.InlineKeyboardButton(get_text(user_id, "btn_files"), callback_data="menu_files"),
+        types.InlineKeyboardButton(get_text(user_id, "btn_news"), callback_data="menu_news"),
         types.InlineKeyboardButton(get_text(user_id, "btn_lang"), callback_data="menu_language"),
         types.InlineKeyboardButton(get_text(user_id, "btn_about"), callback_data="menu_about")
     )
@@ -190,6 +199,9 @@ def callback_handler(call):
             types.InlineKeyboardButton(get_text(user_id, "btn_back"), callback_data="menu_back")
         )
         bot.send_message(chat_id, get_text(user_id, "files_title"), reply_markup=markup, parse_mode="Markdown")
+    elif call.data == "menu_news":
+        bot.answer_callback_query(call.id)
+        bot.send_message(chat_id, get_text(user_id, "news_title"), parse_mode="Markdown")
     elif call.data == "del_last":
         bot.answer_callback_query(call.id)
         bot.send_message(chat_id, get_text(user_id, "del_last_done"))
@@ -211,7 +223,6 @@ def handle_incoming_content(message):
 
     if any(word in text_content.lower() for word in ["все клас", "дякую", "спасибі", "super", "dziękuję", "клас"]):
         if user_id in user_last_tasks:
-            task_info = user_last_tasks[user_id]
             bot.send_message(
                 chat_id, 
                 f"👍 Будь ласка! Радий допомогти! ✨\n📁 Старий варіант задачі успішно видалено, а фінальний поправлений конспект надійно збережено у папку.",
@@ -237,15 +248,11 @@ def handle_incoming_content(message):
 
 def process_user_buffer(chat_id, user_id):
     time.sleep(BUFFER_TIME) 
-    
     if chat_id not in user_buffers or not user_buffers[chat_id]:
         return
-        
     user_buffers[chat_id] = []
-    
     bot.send_chat_action(chat_id, 'typing')
     time.sleep(1.5)
-    
     user_last_tasks[user_id] = {"status": "active"}
     bot.send_message(chat_id, get_text(user_id, "processed"), parse_mode="Markdown")
 
@@ -268,9 +275,8 @@ def morning_notification_scheduler():
         else:
             time.sleep(30)
 
-morning_thread = threading.Thread(target=morning_notification_scheduler, daemon=True)
-morning_thread.start()
+threading.Thread(target=morning_notification_scheduler, daemon=True).start()
 
 if __name__ == '__main__':
-    print("Супер-бот з точним токеном заведено у хмару! 🚀")
+    print("Повний бот із новинами, мовами та правками заведено! 🚀")
     bot.infinity_polling(timeout=60, long_polling_timeout=60)
