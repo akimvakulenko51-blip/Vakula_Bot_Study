@@ -16,7 +16,7 @@ ADMIN_USERNAME = "A_Vakul"
 TELEGRAM_TOKEN = "8962758198:AAFvO2j9gdmjspxKnQORTYAyIbjTDvgva3I"
 
 # ВСТАВ СВОЙ КЛЮЧ GEMINI СЮДА (У ЛАПКАХ):
-GEMINI_API_KEY = "AQ.Ab8RN6IL4eZKeFGnuHwEO1wv2QzluHoYc4VTaEoVq0QrAkHjUQ"
+GEMINI_API_KEY = "AQ.Ab8RN6KUYBT8VAK2sEkG473OlNSOkakqwZxr22CrxVvayZ8J3A"
 
 genai.configure(api_key=GEMINI_API_KEY)
 ai_model = genai.GenerativeModel('gemini-1.5-flash')
