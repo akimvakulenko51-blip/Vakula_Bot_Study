@@ -27,7 +27,7 @@ threading.Thread(target=run_flask, daemon=True).start()
 # ==========================================
 ADMIN_ID = 7613612803
 ADMIN_USERNAME = "A_Vakul"
-TOKEN = "8962758198:AAEJrDUz7xzW3w_pkg64IGt_MISwjAdCmio"
+TOKEN = "8962758198:AAFvO2j9gdmjspxKnQORTYAyIbjTDvgva3I"
 
 bot = telebot.TeleBot(TOKEN)
 
