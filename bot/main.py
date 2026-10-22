@@ -26,12 +26,12 @@ threading.Thread(target=run_flask, daemon=True).start()
 # 2. КОНФІГУРАЦІЯ ТА АДМІНІСТРУВАННЯ
 # ==========================================
 ADMIN_ID = 7613612803
-ADMIN_USERNAME = "@A_Vakul"
+ADMIN_USERNAME = "A_Vakul"
 TOKEN = "8962758198:AAEJrDUz7xzW3w_pkg64IGt_MISwjAdCmio"
 
 bot = telebot.TeleBot(TOKEN)
 
-BUFFER_TIME = 45  # Буфер 45 секунд для фото, документів і голосових
+BUFFER_TIME = 45  # Буфер 45 секунд для голосу, фото та документів
 user_buffers = {}
 user_languages = {} 
 user_last_tasks = {}  
@@ -124,6 +124,10 @@ def get_text(user_id, key):
         lang = "uk"
     return LANGS[lang].get(key, LANGS["uk"][key])
 
+def is_admin(user):
+    # Суворий захист: перевірка і по ID, і по нікнейму
+    return int(user.id) == ADMIN_ID or (user.username and user.username.lower() == ADMIN_USERNAME.lower())
+
 def get_lublin_weather():
     try:
         url = "https://wttr.in/Lublin?format=%t+%C"
@@ -139,15 +143,20 @@ def get_lublin_weather():
 # ==========================================
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-    user_id = message.from_user.id
+    user = message.from_user
+    user_id = user.id
+    
     if user_id not in user_languages:
         user_languages[user_id] = "uk"
-    show_main_menu(message.chat.id, user_id, is_start=True)
+    
+    show_main_menu(message.chat.id, user, is_start=True)
 
-def show_main_menu(chat_id, user_id, is_start=False):
+def show_main_menu(chat_id, user, is_start=False):
+    user_id = user.id
     lang = user_languages.get(user_id, "uk")
-    # Перевірка на адміністратора (боса Акіма)
-    if user_id == ADMIN_ID:
+    
+    # Визначаємо чи це бос Акім
+    if is_admin(user):
         greeting = LANGS[lang]["welcome_admin"]
     else:
         greeting = LANGS[lang]["welcome_user"]
@@ -192,7 +201,7 @@ def language_handler(call):
 
     user_languages[user_id] = call.data.split("_")[1]
     bot.answer_callback_query(call.id, "✨")
-    show_main_menu(chat_id, user_id)
+    show_main_menu(chat_id, call.from_user)
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_handler(call):
@@ -225,7 +234,7 @@ def callback_handler(call):
         bot.send_message(chat_id, get_text(user_id, "about_text"), parse_mode="Markdown")
     elif call.data == "menu_back":
         bot.answer_callback_query(call.id)
-        show_main_menu(chat_id, user_id)
+        show_main_menu(chat_id, call.from_user)
 
 # ==========================================
 # 6. БУФЕР (45 СЕК) ТА СИСТЕМА ПРАВОК
@@ -299,7 +308,7 @@ threading.Thread(target=morning_notification_scheduler, daemon=True).start()
 # 8. ЗАПУСК БЕЗ КОНФЛІКТІВ (ПОПЕРЕДЖЕННЯ 409)
 # ==========================================
 if __name__ == '__main__':
-    print("Максимальний ультимативний академічний бот заведено у хмару! 🚀")
+    print("Ультимативний академічний бот повністю запущено! 🚀")
     while True:
         try:
             bot.remove_webhook()
