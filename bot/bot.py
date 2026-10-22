@@ -13,10 +13,10 @@ import google.generativeai as genai
 # ==========================================
 ADMIN_ID = 7613612803
 ADMIN_USERNAME = "A_Vakul"
-TELEGRAM_TOKEN = "8962758198:AAEJrDUz7xzW3w_pkg64IGt_MISwjAdCmio"
+TELEGRAM_TOKEN = "8962758198:AAFvO2j9gdmjspxKnQORTYAyIbjTDvgva3I"
 
 # ВСТАВ СВОЙ КЛЮЧ GEMINI СЮДА:
-GEMINI_API_KEY = "ТВОЙ_GEMINI_API_KEY"
+GEMINI_API_KEY = "AQ.Ab8RN6IL4eZKeFGnuHwEO1wv2QzluHoYc4VTaEoVq0QrAkHjUQ"
 
 # Инициализация ИИ Gemini
 genai.configure(api_key=GEMINI_API_KEY)
