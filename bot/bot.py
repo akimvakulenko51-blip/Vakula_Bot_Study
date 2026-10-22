@@ -15,17 +15,15 @@ ADMIN_ID = 7613612803
 ADMIN_USERNAME = "A_Vakul"
 TELEGRAM_TOKEN = "8962758198:AAFvO2j9gdmjspxKnQORTYAyIbjTDvgva3I"
 
-# ВСТАВ СВОЙ КЛЮЧ GEMINI СЮДА:
+# ВСТАВ СВОЙ КЛЮЧ GEMINI СЮДА (У ЛАПКАХ):
 GEMINI_API_KEY = "AQ.Ab8RN6IL4eZKeFGnuHwEO1wv2QzluHoYc4VTaEoVq0QrAkHjUQ"
 
-# Инициализация ИИ Gemini
 genai.configure(api_key=GEMINI_API_KEY)
 ai_model = genai.GenerativeModel('gemini-1.5-flash')
 
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
-
-# Веб-сервер для хмари Render
 app = Flask(__name__)
+
 @app.route('/')
 def home():
     return "Vakula Bot Ultimate AI Pro is active 24/7! 🚀"
@@ -39,28 +37,31 @@ threading.Thread(target=run_flask, daemon=True).start()
 BUFFER_TIME = 45
 user_buffers = {}
 user_languages = {} 
-user_last_tasks = {}  
+user_last_tasks = {}      # Для правок
+user_drafts = {}          # Тимчасова відповідь ШІ
+user_saved_materials = {} # Затверджені (збережені) відповіді
 
 # ==========================================
-# 2. МАСШТАБНИЙ БАГАТОМОВНИЙ СЛОВНИК
+# 2. МАСШТАБНИЙ СЛОВНИК
 # ==========================================
 LANGS = {
     "uk": {
-        "welcome_user": "Вітаю! 👋 Я твій академічний помічник Люблінської політехніки (1 курс, Механіка і будова машин).\n\nТут ти можеш переглядати дисципліни, розгорнуті новини університету та користуватися матеріалами. Обери потрібний розділ нижче:",
+        "welcome_user": "Вітаю! 👋 Я твій академічний помічник Люблінської політехніки (1 курс, Механіка і будова машин).\n\nТут ти можеш переглядати дисципліни, розгорнуті новини університету та користуватися матеріалами.",
         "btn_subjects": "📚 Дисципліни (7 предметів)",
-        "btn_files": "🗑️ Навчальні матеріали",
+        "btn_files": "🗑️ Управління матеріалами",
         "btn_news": "📰 Новини університету",
         "btn_lang": "🇺🇦 🇷🇺 🇬🇧 🇵🇱 Змінити мову",
         "btn_about": "ℹ️ Про систему 24/7",
         "subjects_title": "📖 **Список твоїх дисциплін (1 курс — Механіка і будова машин):**\n\n1. Механіка та опора матеріалів ⚙️\n2. Інженерна графіка та геометрія 📐\n3. Вища математика 📊\n4. Фізика ⚛️\n5. Програмування та ІТ 💻\n6. Матеріалознавство 🔬\n7. Польська мова (B2) 🇵🇱",
-        "files_title": "🗑️ **Панель матеріалів:**",
+        "files_title": "🗑️ **Панель матеріалів та збережених рішень:**",
+        "btn_view_saved": "📂 Переглянути збережені відповіді",
         "btn_del_last": "❌ Видалити останній запит",
         "btn_del_all": "🧹 Очистити все сховище",
         "btn_back": "🔙 Головне меню",
-        "del_last_done": "✅ Останній матеріал успішно видалено!",
-        "del_all_done": "🧹 Усі тимчасові файли очищено!",
-        "news_title": "📰 **Новини (Люблінська політехніка):**\n\n• **Академічний процес:** Заняття для першокурсників проходять за розкладом на Велькопольській.\n• **Сесія:** Наближаються колоквіуми з вищої математики. Повторіть методички!",
-        "about_text": "🤖 **Інформація про систему:** Хмарний сервер Render 24/7 з підтримкою Gemini AI для розбору задач.",
+        "del_last_done": "✅ Останній запит успішно видалено!",
+        "del_all_done": "🧹 Усі збережені матеріали повністю очищено!",
+        "news_title": "📰 **Новини (Люблінська політехніка):**\n\n• **Академічний процес:** Заняття проходять за розкладом на Велькопольській.\n• **Сесія:** Наближаються колоквіуми з вищої математики. Повторіть методички!",
+        "about_text": "🤖 **Інформація:** Хмарний сервер Render 24/7 з підтримкою Gemini AI.",
     }
 }
 
@@ -104,8 +105,8 @@ def show_main_menu(chat_id, user, is_start=False):
     if is_admin(user):
         greeting = (
             f"😎🔥 **{time_greet}, босе Акіме!**\n\n"
-            f"Ласкаво просимо до твого елітного академічного штабу (Політехніка Любельська, 1 курс). "
-            f"ШІ-система Gemini налаштована на максимальну потужність: чекаю твої завдання, голосівки, фото чи креслення. Повний доступ активовано! 🚀"
+            f"Академічний штаб (Політехніка Любельська, 1 курс). "
+            f"ШІ-система готова: чекаю твої завдання, голосівки чи фото. Повний доступ активовано! 🚀"
         )
     else:
         greeting = get_text(user_id, "welcome_user")
@@ -122,10 +123,8 @@ def show_main_menu(chat_id, user, is_start=False):
     if is_start:
         bot.send_message(chat_id, greeting, reply_markup=markup, parse_mode="Markdown")
     else:
-        try:
-            bot.edit_message_text(greeting, chat_id, chat_id, reply_markup=markup, parse_mode="Markdown")
-        except Exception:
-            bot.send_message(chat_id, greeting, reply_markup=markup, parse_mode="Markdown")
+        try: bot.edit_message_text(greeting, chat_id, chat_id, reply_markup=markup, parse_mode="Markdown")
+        except Exception: bot.send_message(chat_id, greeting, reply_markup=markup, parse_mode="Markdown")
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith("lang_") or call.data == "menu_language")
 def language_handler(call):
@@ -134,10 +133,10 @@ def language_handler(call):
         bot.answer_callback_query(call.id)
         markup = types.InlineKeyboardMarkup(row_width=2)
         markup.add(
-            types.InlineKeyboardButton("🇺🇦 Українська", callback_data="lang_uk"),
-            types.InlineKeyboardButton("🇷🇺 Русский", callback_data="lang_ru"),
-            types.InlineKeyboardButton("🇬🇧 English", callback_data="lang_en"),
-            types.InlineKeyboardButton("🇵🇱 Polski", callback_data="lang_pl")
+            types.InlineKeyboardButton("🇺🇦 Укр", callback_data="lang_uk"),
+            types.InlineKeyboardButton("🇷🇺 Рус", callback_data="lang_ru"),
+            types.InlineKeyboardButton("🇬🇧 Eng", callback_data="lang_en"),
+            types.InlineKeyboardButton("🇵🇱 Pol", callback_data="lang_pl")
         )
         markup.add(types.InlineKeyboardButton("🔙 Назад", callback_data="menu_back"))
         bot.edit_message_text("🌐 **Оберіть мову / Choose language:**", chat_id, call.message.message_id, reply_markup=markup, parse_mode="Markdown")
@@ -155,13 +154,25 @@ def callback_handler(call):
     elif call.data == "menu_files":
         markup = types.InlineKeyboardMarkup(row_width=1)
         markup.add(
+            types.InlineKeyboardButton(get_text(user_id, "btn_view_saved"), callback_data="view_saved"),
             types.InlineKeyboardButton(get_text(user_id, "btn_del_last"), callback_data="del_last"),
             types.InlineKeyboardButton(get_text(user_id, "btn_del_all"), callback_data="del_all"),
             types.InlineKeyboardButton(get_text(user_id, "btn_back"), callback_data="menu_back")
         )
         bot.send_message(chat_id, get_text(user_id, "files_title"), reply_markup=markup, parse_mode="Markdown")
-    elif call.data in ["del_last", "del_all"]:
-        bot.send_message(chat_id, get_text(user_id, f"{call.data}_done"))
+    elif call.data == "view_saved":
+        if user_id in user_saved_materials and user_saved_materials[user_id]:
+            saved_text = user_saved_materials[user_id][-1]
+            bot.send_message(chat_id, f"📂 **Твій останній збережений конспект:**\n\n{saved_text[:3900]}", parse_mode="Markdown")
+        else:
+            bot.send_message(chat_id, "📂 Твоє сховище поки що порожнє. Попроси ШІ щось вирішити і напиши «все клас», щоб зберегти сюди відповідь!")
+    elif call.data == "del_last":
+        if user_id in user_saved_materials and user_saved_materials[user_id]:
+            user_saved_materials[user_id].pop()
+        bot.send_message(chat_id, get_text(user_id, "del_last_done"))
+    elif call.data == "del_all":
+        user_saved_materials[user_id] = []
+        bot.send_message(chat_id, get_text(user_id, "del_all_done"))
     elif call.data == "menu_news":
         bot.send_message(chat_id, get_text(user_id, "news_title"), parse_mode="Markdown")
     elif call.data == "menu_about":
@@ -179,21 +190,26 @@ def handle_incoming_content(message):
     user = message.from_user
 
     if not is_admin(user):
-        bot.send_message(chat_id, "👋 Привіт! У тебе студентський доступ. Користуйся меню вище для матеріалів та новин. ШІ-розбір доступний адміністратору.")
+        bot.send_message(chat_id, "👋 Студентський доступ: ШІ-розбір доступний лише адміністратору.")
         return
 
     text_content = message.text or message.caption or ""
 
+    # Збереження матеріалу після підтвердження
     if any(word in text_content.lower() for word in ["все клас", "дякую", "спасибі", "super", "клас"]):
-        if user.id in user_last_tasks:
-            bot.send_message(chat_id, "👍 Будь ласка, босе Акіме! Фінальний розбір збережено.")
-            del user_last_tasks[user.id]
+        if user.id in user_drafts:
+            if user.id not in user_saved_materials:
+                user_saved_materials[user.id] = []
+            user_saved_materials[user.id].append(user_drafts[user.id])
+            bot.send_message(chat_id, "👍 Будь ласка, босе Акіме! Твоє рішення успішно переміщено до Сховища (Управління матеріалами).")
+            del user_drafts[user.id]
+            if user.id in user_last_tasks:
+                del user_last_tasks[user.id]
             return
 
     if any(word in text_content.lower() for word in ["не встр", "не так", "поправ", "правк", "зміни"]):
         if user.id in user_last_tasks:
             bot.send_message(chat_id, "🔄 Прийнято, босе! Перераховую задачу з урахуванням твоїх правок... ⏳")
-            # Отправка правок тоже пойдет в буфер для анализа ИИ
 
     if chat_id not in user_buffers:
         user_buffers[chat_id] = []
@@ -214,12 +230,12 @@ def process_ai_buffer(chat_id, user):
     try:
         prompt_parts = [
             "Ти — елітний AI-помічник для студента 1 курсу «Механіка і будова машин» Люблінської політехніки. "
-            "Твоє завдання — детально і зрозуміло розбирати інженерні та математичні задачі з наданих файлів або тексту. "
-            "Відповідай структуровано, професійно та дружньо до боса Акіма. Мова відповідей — українська."
+            "Твоє завдання — детально розбирати інженерні та математичні задачі з наданих файлів або тексту. "
+            "Відповідай структуровано, професійно та дружньо до боса Акіма."
         ]
 
         for msg in messages_batch:
-            if msg.text: prompt_parts.append(f"Текст: {msg.text}")
+            if msg.text: prompt_parts.append(f"Запит: {msg.text}")
             elif msg.caption: prompt_parts.append(f"Підпис: {msg.caption}")
             elif msg.photo:
                 file_info = bot.get_file(msg.photo[-1].file_id)
@@ -232,7 +248,9 @@ def process_ai_buffer(chat_id, user):
 
         response = ai_model.generate_content(prompt_parts)
         ai_answer = response.text
+        
         user_last_tasks[user.id] = {"status": "active"}
+        user_drafts[user.id] = ai_answer # Зберігаємо в чернетку для подальшого підтвердження
         
         if len(ai_answer) > 4000:
             for x in range(0, len(ai_answer), 4000): bot.send_message(chat_id, ai_answer[x:x+4000], parse_mode="Markdown")
@@ -240,7 +258,7 @@ def process_ai_buffer(chat_id, user):
             bot.send_message(chat_id, ai_answer, parse_mode="Markdown")
 
     except Exception as e:
-        bot.send_message(chat_id, f"⚠️ Помилка Gemini API: `{e}`", parse_mode="Markdown")
+        bot.send_message(chat_id, f"⚠️ Помилка Gemini API (можливо, невірний ключ): `{e}`", parse_mode="Markdown")
 
 # ==========================================
 # 5. РАНКОВИЙ ШЕДУЛЕР О 9:00
@@ -253,9 +271,9 @@ def morning_notification_scheduler():
             morning_msg = (
                 f"☀️ **Добрий ранок, босе Акіме!**\n\n"
                 f"🌡️ Погода в Любліні: **{weather}**.\n"
-                f"🏛️ **Університет:** Екстрених оголошень немає. Поточний розклад для механіків 1 курсу виконується стабільно.\n"
-                f"⚠️ **Увага:** Наближається сесія. Якщо скоро колоквіум — кидай завдання, ШІ готовий до розбору!\n\n"
-                f"☕ Сервер працює 24/7. Чекаю на задачі! 💪🎓"
+                f"🏛️ **Університет:** Екстрених оголошень немає.\n"
+                f"⚠️ **Увага:** Наближається сесія. Якщо скоро колоквіум — кидай завдання!\n\n"
+                f"☕ Сервер працює 24/7."
             )
             try: bot.send_message(ADMIN_ID, morning_msg, parse_mode="Markdown")
             except Exception: pass
@@ -266,15 +284,15 @@ def morning_notification_scheduler():
 threading.Thread(target=morning_notification_scheduler, daemon=True).start()
 
 # ==========================================
-# 6. БЕЗПЕЧНИЙ ЗАПУСК БЕЗ КОНФЛІКТІВ
+# 6. БЕЗПЕЧНИЙ ЗАПУСК
 # ==========================================
 if __name__ == '__main__':
-    print("Бот з підтримкою Gemini AI та шедулером успішно запущено! 🚀")
+    print("Бот з підтримкою Gemini AI та сховищем запущено! 🚀")
     while True:
         try:
             bot.remove_webhook()
             time.sleep(1)
             bot.polling(none_stop=True, interval=1, timeout=30)
         except Exception as e:
-            print(f"Помилка підключення: {e}")
+            print(f"Помилка: {e}")
             time.sleep(3)
