@@ -331,12 +331,5 @@ threading.Thread(target=morning_notification_scheduler, daemon=True).start()
 # 8. ЗАПУСК БЕЗ КОНФЛІКТІВ (ПОПЕРЕДЖЕННЯ 409)
 # ==========================================
 if __name__ == '__main__':
-    print("Ультимативний академічний бот VAKULA STUDY ENTERPRISE PRO запущено у хмару! 🚀")
-    while True:
-        try:
-            bot.remove_webhook()
-            time.sleep(1)
-            bot.polling(none_stop=True, interval=1, timeout=30)
-        except Exception as e:
-            print(f"Помилка polling: {e}")
-            time.sleep(3)
+    print("Бот успішно запущено у хмарі Render! 🚀")
+    bot.infinity_polling(timeout=60, long_polling_timeout=60)
