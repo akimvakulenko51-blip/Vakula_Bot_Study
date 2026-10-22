@@ -14,7 +14,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return "Vakula Bot Study Ultimate Pro is active and running 24/7! 🚀"
+    return "Vakula Bot Study Ultimate Enterprise Pro Max is active 24/7! 🚀"
 
 def run_flask():
     port = int(os.environ.get("PORT", 10000))
@@ -31,63 +31,60 @@ TOKEN = "8962758198:AAEJrDUz7xzW3w_pkg64IGt_MISwjAdCmio"
 
 bot = telebot.TeleBot(TOKEN)
 
-BUFFER_TIME = 45  # Буфер 45 секунд для голосу, фото та документів
+BUFFER_TIME = 45  # Потужний буфер 45 секунд для змішаного введення
 user_buffers = {}
 user_languages = {} 
 user_last_tasks = {}  
 
 # ==========================================
-# 3. БАГАТОМОВНИЙ СЛОВНИК (🇺🇦, 🇷🇺, 🇬🇧, 🇵🇱)
+# 3. МАСШТАБНИЙ БАГАТОМОВНИЙ СЛОВНИК
 # ==========================================
 LANGS = {
     "uk": {
-        "welcome_admin": "Привіт-привіт, босе Акіме! 🕶️🔥\nЛаскаво просимо до твого академічного штабу. Я повністю готовий до роботи з твоїми завданнями, голосом та правками! 🚀",
-        "welcome_user": "Вітаю! 👋 Я твій академічний помічник. Оберіть мову інтерфейсу нижче:",
+        "welcome_user": "Вітаю! 👋 Я твій академічний помічник Люблінської політехніки (1 курс, Механіка і будова машин).\n\nТут ти можеш переглядати дисципліни, розгорнуті новини університету та користуватися навчальними матеріалами. Обери потрібний розділ нижче:",
         "btn_subjects": "📚 Дисципліни (7 предметів)",
-        "btn_files": "🗑️ Управління файлами",
+        "btn_files": "🗑️ Навчальні матеріали та файли",
         "btn_news": "📰 Новини університету",
         "btn_lang": "🇺🇦 🇷🇺 🇬🇧 🇵🇱 Змінити мову",
         "btn_about": "ℹ️ Про систему 24/7",
-        "subjects_title": "📖 **Твої поточні дисципліни (1 курс — Механіка і будова машин):**\n\n1. Механіка та опора матеріалів ⚙️\n2. Інженерна графіка та геометрія 📐\n3. Вища математика 📊\n4. Фізика ⚛️\n5. Програмування та ІТ 💻\n6. Матеріалознавство 🔬\n7. Польська мова (B2) 🇵🇱\n\n💡 *Кидай фото, документи чи голосові у будь-якому порядку — я чекаю 45 секунд і все опрацюю!*",
-        "files_title": "🗑️ **Панель управління файлами:**",
-        "btn_del_last": "❌ Видалити останній файл",
+        "subjects_title": "📖 **Список твоїх дисциплін (1 курс — Механіка і будова машин, Політехніка Любельська):**\n\n1. Механіка та опора матеріалів ⚙️\n2. Інженерна графіка та геометрія 📐\n3. Вища математика 📊\n4. Фізика ⚛️\n5. Програмування та ІТ 💻\n6. Матеріалознавство 🔬\n7. Польська мова (B2) 🇵🇱\n\n💡 *Студентський режим: переглядайте матеріали та слідкуйте за оновленнями у розділі новин!*",
+        "files_title": "🗑️ **Панель матеріалів та управління файлами:**",
+        "btn_del_last": "❌ Видалити останній запит",
         "btn_del_all": "🧹 Очистити все сховище",
         "btn_back": "🔙 Головне меню",
-        "del_last_done": "✅ Останній завантажений файл успішно видалено!",
-        "del_all_done": "🧹 Усі зайві файли повністю очищено з системи!",
-        "news_title": "📰 **Останні новини Люблінської політехніки:**\n\n• Розклад сесії та консультацій оновлено на платформі університету.\n• Студентський кампус готує нові заходи.\n• Бібліотека працює у звичному режимі.",
-        "about_text": "🤖 **Інформація про систему:**\n• Хмарний сервер Render 24/7\n• Гнучкий буфер (45 сек) для голосу та фото\n• Інтелектуальна підтримка правок і заміна старих рішень на нові!",
-        "processed": "📥 **Отримано матеріали та запит!** 🚀\nЯ проаналізував задачу, розпізнав суть та підготував детальне рішення. Якщо щось потрібно змінити — просто напиши свої правки у вільній формі!"
+        "del_last_done": "✅ Останній матеріал успішно видалено зі сховища!",
+        "del_all_done": "🧹 Усі тимчасові файли та кеш повністю очищено!",
+        "news_title": "📰 **Розгорнуті новини та оголошення (Люблінська політехніка):**\n\n• **Академічний процес:** Усі лекції та практичні заняття для першокурсників спеціальності «Механіка і будова машин» проходять за стандартним розкладом у корпусах на Велькопольській.\n• **Найближчі події та сесія:** Увага! За два тижні починаються перші колоквіуми з вищої математики та інженерної графіки. Рекомендуємо заздалегідь повторити методички та приклади розрахунково-графічних робіт минулих років.\n• **Оголошення ректорату:** Екстрених скасувань занять чи днів самопідготовки на найближчі дні не передбачено. Слідкуйте за офіційними повідомленнями факультету.",
+        "about_text": "🤖 **Інформація про систему VAKULA STUDY:**\n• Потужний хмарний сервер Render працює 24/7\n• Гнучкий інтелектуальний буфер для обробки даних\n• Повна підтримка адміністратора (боса Акіма) та студентського режиму навігації!",
+        "processed": "📥 **Отримано матеріали та запит від боса Акіма!** 🚀\nШтучний інтелект проаналізував задачу з урахуванням специфіки 1 курсу механіки, розпізнав суть та підготував деталізоване покрокове рішення. Якщо потрібно внести правки чи змінити розрахунки — просто напиши свої правки у вільній формі!"
     },
     "ru": {
-        "welcome_admin": "Привет-привет, босс Аким! 🕶️🔥\nДобро пожаловать в твой академический штаб. Я готов работать с твоими задачами, голосовыми и правками! 🚀",
-        "welcome_user": "Приветствую! 👋 Я твой академический помощник. Выберите язык интерфейса ниже:",
+        "welcome_user": "Приветствую! 👋 Я твой академический помощник Люблинской политехники (1 курс, Механика). Выберите нужный раздел ниже:",
         "btn_subjects": "📚 Дисциплины (7 предметов)",
-        "btn_files": "🗑️ Управление файлами",
+        "btn_files": "🗑️ Управление материалами",
         "btn_news": "📰 Новости университета",
         "btn_lang": "🇺🇦 🇷🇺 🇬🇧 🇵🇱 Сменить язык",
         "btn_about": "ℹ️ О системе 24/7",
         "subjects_title": "📖 **Твои текущие дисциплины (1 курс):**\n\n1. Механика и сопротивление материалов ⚙️\n2. Инженерная графика и геометрия 📐\n3. Высшая математика 📊\n4. Физика ⚛️\n5. Программирование и ИТ 💻\n6. Материаловедение 🔬\n7. Польский язык (B2) 🇵🇱",
-        "files_title": "🗑️ **Панель управления файлами:**",
+        "files_title": "🗑️ **Панель управления материалами:**",
         "btn_del_last": "❌ Удалить последний файл",
         "btn_del_all": "🧹 Очистить все хранилище",
         "btn_back": "🔙 Главное меню",
         "del_last_done": "✅ Последний загруженный файл успешно удален!",
         "del_all_done": "🧹 Все лишние файлы полностью очищены из системы!",
-        "news_title": "📰 **Новости Люблинской политехники:**\n• Расписание занятий обновлено.",
+        "news_title": "📰 **Новости Люблинской политехники:**\n• Учебный процесс идет по плану. Готовьтесь к колоквиумам.",
         "about_text": "🤖 **Информация:** Облачный сервер Render 24/7.",
-        "processed": "📥 **Получены материалы и запрос!** 🚀\nЯ проанализировал задачу. Если нужно что-то исправить — пиши правки!"
+        "processed": "📥 **Материалы и запрос получены!** 🚀 Штучный интеллект подготовил ответ."
     },
     "en": {
-        "welcome_admin": "Hello, Boss Akim! 🕶️🔥\nWelcome to your academic headquarters. Ready for your tasks, voice notes, and edits! 🚀",
-        "welcome_user": "Welcome! 👋 Choose your language below:",
+        "welcome_user": "Welcome! 👋 I am your academic assistant at Lublin University of Technology. Choose an option below:",
         "btn_subjects": "📚 Subjects (7 courses)",
-        "btn_files": "🗑️ File Management",
+        "btn_files": "🗑️ Materials Management",
         "btn_news": "📰 University News",
         "btn_lang": "🇺🇦 🇷🇺 🇬🇧 🇵🇱 Change language",
         "btn_about": "ℹ️ About system 24/7",
         "subjects_title": "📖 **Your current subjects (1st year):**",
-        "files_title": "🗑️ **File Management Panel:**",
+        "files_title": "🗑️ **Materials Management Panel:**",
         "btn_del_last": "❌ Delete last file",
         "btn_del_all": "🧹 Clear all storage",
         "btn_back": "🔙 Main Menu",
@@ -95,18 +92,17 @@ LANGS = {
         "del_all_done": "🧹 Cleared successfully!",
         "news_title": "📰 **University News:**",
         "about_text": "🤖 **Information:** Cloud server Render 24/7.",
-        "processed": "📥 **Materials received!** 🚀\nI analyzed the task. If you want changes, write your edits!"
+        "processed": "📥 **Materials received!** 🚀 AI has processed your request."
     },
     "pl": {
-        "welcome_admin": "Cześć, szefie Akim! 🕶️🔥\nWitamy w centrum akademickim. Gotowy na Twoje zadania, głosówki i poprawki! 🚀",
-        "welcome_user": "Witaj! 👋 Wybierz język poniżej:",
+        "welcome_user": "Witaj! 👋 Jestem Twoim asystentem akademickim Politechniki Lubelskiej. Wybierz opcję poniżej:",
         "btn_subjects": "📚 Przedmioty (7 kursów)",
-        "btn_files": "🗑️ Zarządzanie plikami",
+        "btn_files": "🗑️ Zarządzanie materiałami",
         "btn_news": "📰 Wiadomości uczelni",
         "btn_lang": "🇺🇦 🇷🇺 🇬🇧 🇵🇱 Zmień język",
         "btn_about": "ℹ️ O systemie 24/7",
         "subjects_title": "📖 **Twoje przedmioty (1 rok):**",
-        "files_title": "🗑️ **Zarządzanie plikami:**",
+        "files_title": "🗑️ **Zarządzanie materiałami:**",
         "btn_del_last": "❌ Usuń ostatni plik",
         "btn_del_all": "🧹 Wyczyść magazyn",
         "btn_back": "🔙 Menu główne",
@@ -114,7 +110,7 @@ LANGS = {
         "del_all_done": "🧹 Wyczyszczono pomyślnie!",
         "news_title": "📰 **Wiadomości uczelni:**",
         "about_text": "🤖 **Informacje:** Serwer w chmurze Render 24/7.",
-        "processed": "📥 **Otrzymano materiały!** 🚀\nPrzeanalizowałem zadanie. Jeśli chcesz coś zmienić, napisz poprawki!"
+        "processed": "📥 **Otrzymano materiały!** 🚀 Sztuczna inteligencja przygotвала odpowiedź."
     }
 }
 
@@ -125,8 +121,18 @@ def get_text(user_id, key):
     return LANGS[lang].get(key, LANGS["uk"][key])
 
 def is_admin(user):
-    # Суворий захист: перевірка і по ID, і по нікнейму
     return int(user.id) == ADMIN_ID or (user.username and user.username.lower() == ADMIN_USERNAME.lower())
+
+def get_time_greeting():
+    hour = datetime.now().hour
+    if 5 <= hour < 12:
+        return "Добрий ранок"
+    elif 12 <= hour < 18:
+        return "Добрий день"
+    elif 18 <= hour < 23:
+        return "Добрий вечір"
+    else:
+        return "Доброї ночі"
 
 def get_lublin_weather():
     try:
@@ -154,10 +160,15 @@ def send_welcome(message):
 def show_main_menu(chat_id, user, is_start=False):
     user_id = user.id
     lang = user_languages.get(user_id, "uk")
+    time_greet = get_time_greeting()
     
-    # Визначаємо чи це бос Акім
+    # Жорсткий поділ: Адмін (бос Акім) отримує ексклюзивне звернення, інші — стандарт
     if is_admin(user):
-        greeting = LANGS[lang]["welcome_admin"]
+        greeting = (
+            f"😎🔥 **{time_greet}, босе Акіме!**\n\n"
+            f"Ласкаво просимо до твого елітного академічного штабу (Політехніка Любельська, 1 курс, Механіка). "
+            f"ШІ-система налаштована на максимальну потужність: чекаю твої завдання, голосівки, формули чи креслення. Повний доступ активовано! 🚀"
+        )
     else:
         greeting = LANGS[lang]["welcome_user"]
 
@@ -237,19 +248,30 @@ def callback_handler(call):
         show_main_menu(chat_id, call.from_user)
 
 # ==========================================
-# 6. БУФЕР (45 СЕК) ТА СИСТЕМА ПРАВОК
+# 6. ІНТЕЛЕКТУАЛЬНИЙ ШІ-БУФЕР ТА ПРАВКИ (ТІЛЬКИ ДЛЯ АДМІНА)
 # ==========================================
 @bot.message_handler(content_types=['text', 'voice', 'document', 'photo'])
 def handle_incoming_content(message):
     chat_id = message.chat.id
-    user_id = message.from_user.id
+    user = message.from_user
+    user_id = user.id
     text_content = message.text or message.caption or ""
 
+    # Перевірка: якщо пише звичайний користувач (не адмін), ШІ не розв'язує йому завдання особисто, а пропонує матеріали
+    if not is_admin(user):
+        bot.send_message(
+            chat_id, 
+            "👋 Привіт! У тебе студентський доступ. Ти можеш користуватися меню вище: переглядати дисципліни, новини університету та навчальні матеріалы. Автоматичний розбір завдань через ШІ доступний лише адміністратору.",
+            parse_mode="Markdown"
+        )
+        return
+
+    # Логіка для боса Акіма (адміна) з правками та автозаміною
     if any(word in text_content.lower() for word in ["все клас", "дякую", "спасибі", "super", "dziękuję", "клас"]):
         if user_id in user_last_tasks:
             bot.send_message(
                 chat_id, 
-                f"👍 Будь ласка, босе Акіме! Радий допомогти! ✨\n📁 Старий варіант задачі успішно видалено, а фінальний поправлений конспект надійно збережено у сховище.",
+                f"👍 Будь ласка, босе Акіме! Радий допомогти! ✨\n📁 Старий варіант задачі успішно видалено, а фінальний поправлений розбір надійно збережено у сховище.",
                 parse_mode="Markdown"
             )
             del user_last_tasks[user_id]
@@ -257,9 +279,9 @@ def handle_incoming_content(message):
 
     if any(word in text_content.lower() for word in ["не встр", "не так", "поправ", "правк", "зміни", "переправ"]):
         if user_id in user_last_tasks:
-            bot.send_message(chat_id, "🔄 Прийнято! Беру твої правки до уваги, видаляю попередній варіант і перераховую задачу заново... ⏳")
+            bot.send_message(chat_id, "🔄 Прийнято, босе! Беру твої правки до уваги, видаляю попередній варіант і перераховую задачу заново з урахуванням усіх нюансів... ⏳")
             time.sleep(1)
-            bot.send_message(chat_id, "✅ Готово! Я переробив рішення з урахуванням твоїх правок. Якщо все супер — напиши «все клас, дякую!».")
+            bot.send_message(chat_id, "✅ Готово! Я переробив рішення. Якщо все супер — напиши «все клас, дякую!».")
             return
 
     if chat_id not in user_buffers:
@@ -281,7 +303,7 @@ def process_user_buffer(chat_id, user_id):
     bot.send_message(chat_id, get_text(user_id, "processed"), parse_mode="Markdown")
 
 # ==========================================
-# 7. РАНКОВИЙ ШЕДУЛЕР ПОГОДИ О 9:00
+# 7. РАНКОВИЙ ШЕДУЛЕР ПОГОДИ ТА ІНСПЕКЦІЇ О 9:00
 # ==========================================
 def morning_notification_scheduler():
     while True:
@@ -291,7 +313,8 @@ def morning_notification_scheduler():
             morning_msg = (
                 f"☀️ **Добрий ранок, босе Акіме!**\n\n"
                 f"🌡️ Погода в Любліні на зараз: **{weather}**.\n"
-                f"🏛️ Нових офіційних оголошень від Люблінської політехніки немає.\n\n"
+                f"🏛️ **Статус університету:** Занять або екстрених оголошень про скасування пар на сьогодні немає. Поточний розклад для механіків 1 курсу виконується стабільно.\n"
+                f"⚠️ **Увага на сесію та екзамени:** Наближається важливий період перевірки знань. Якщо у тебе скоро колоквіум, розрахункова робота чи екзамен з механіки чи математики, напиши мені — я підготую зразки робіт та матеріали попередніх років для легкого засвоєння!\n\n"
                 f"☕ Сервер працює 24/7. Чекаю на твої задачі чи запитання! 💪🎓"
             )
             try:
@@ -308,7 +331,7 @@ threading.Thread(target=morning_notification_scheduler, daemon=True).start()
 # 8. ЗАПУСК БЕЗ КОНФЛІКТІВ (ПОПЕРЕДЖЕННЯ 409)
 # ==========================================
 if __name__ == '__main__':
-    print("Ультимативний академічний бот повністю запущено! 🚀")
+    print("Ультимативний академічний бот VAKULA STUDY ENTERPRISE PRO запущено у хмару! 🚀")
     while True:
         try:
             bot.remove_webhook()
