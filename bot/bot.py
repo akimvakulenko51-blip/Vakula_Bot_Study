@@ -37,7 +37,7 @@ from google.genai import types
 # ============================================================
 
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN", "8962758198:AAFUmzevaYQRmofbMTImrTaXSc9-7tqs8QU")
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AQ.Ab8RN6L5vHywySq2vuq1BML07Fw5xbQCDEpOm1e9jvHse0d5AQ")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AQ.Ab8RN6Iu5yDINZtR4v3NsEtdOmXS6VPcLUk7rFNMZ3BVR1OpVw")
 
 # Set the model name to a model available for your API key.
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
